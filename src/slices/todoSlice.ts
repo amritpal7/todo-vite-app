@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { Todo } from "../types";
+import { Todo, Priority } from "../types";
 
 interface TodoState {
   todos: Todo[];
@@ -7,7 +7,7 @@ interface TodoState {
 }
 
 const initialState: TodoState = {
-  todos: [],
+  todos: JSON.parse(localStorage.getItem("todos") || "[]"),
   searchQuery: "",
 };
 
@@ -15,17 +15,26 @@ const todoSlice = createSlice({
   name: "todos",
   initialState,
   reducers: {
-    addTodo: (state, action: PayloadAction<string>) => {
-      const newTodo: Todo = {
-        id: Date.now().toString(),
-        text: action.payload,
-        completed: false,
-      };
-      state.todos.push(newTodo);
-    },
-    editTodo: (
+    addTodo: (
       state,
-      action: PayloadAction<{ id: string; updatedTodo: string }>
+      action: PayloadAction<{ newTodo: string; priority: Priority }>
+    ) => {
+      const getNewTodo: Todo = {
+        id: Date.now().toString(),
+        text: action.payload.newTodo,
+        completed: false,
+        priority: action.payload.priority,
+      };
+      state.todos.push(getNewTodo);
+      localStorage.setItem("todos", JSON.stringify(state.todos));
+    },
+    updateTodo: (
+      state,
+      action: PayloadAction<{
+        id: string;
+        updatedTodo: string;
+        priority: Priority;
+      }>
     ) => {
       // used find function method
       const getUpdatedTodo = state.todos.find(
@@ -33,7 +42,9 @@ const todoSlice = createSlice({
       );
       if (getUpdatedTodo) {
         getUpdatedTodo.text = action.payload.updatedTodo;
+        getUpdatedTodo.priority = action.payload.priority;
       }
+      localStorage.setItem("todos", JSON.stringify(state.todos));
     },
     toggleCompleteTodo: (state, action: PayloadAction<string>) => {
       // used ternary operation for marking complete task.
@@ -42,10 +53,12 @@ const todoSlice = createSlice({
           ? { ...todo, completed: !todo.completed }
           : todo
       );
+      localStorage.setItem("todos", JSON.stringify(state.todos));
     },
 
     removeTodo: (state, action: PayloadAction<string>) => {
       state.todos = state.todos.filter(todo => todo.id !== action.payload);
+      localStorage.setItem("todos", JSON.stringify(state.todos));
     },
 
     setSearchQuery: (state, action: PayloadAction<string>) => {
@@ -57,7 +70,7 @@ const todoSlice = createSlice({
 export const {
   addTodo,
   removeTodo,
-  editTodo,
+  updateTodo,
   toggleCompleteTodo,
   setSearchQuery,
 } = todoSlice.actions;

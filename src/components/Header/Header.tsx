@@ -1,18 +1,23 @@
 import { Button } from "../ui/button";
-import { Plus } from "lucide-react";
+import { Dialog, DialogContent, DialogTrigger } from "../ui/dialog";
 import { Input } from "../ui/input";
+import { Plus, Calendar, Clock } from "lucide-react";
 import { addTodo } from "../../slices/todoSlice";
 import { useDispatch } from "react-redux";
 import { useState } from "react";
+import { Priority } from "../../types";
 
 const Header = () => {
   const [newTodo, setNewTodo] = useState("");
+  const [priority, setPriority] = useState<Priority>("None");
+
   const dispatch = useDispatch();
 
   const handleAddNewTodo = () => {
     if (!newTodo.trim()) return;
-    dispatch(addTodo(newTodo));
+    dispatch(addTodo({ newTodo, priority }));
     setNewTodo("");
+    setPriority("None");
   };
 
   return (
@@ -24,7 +29,7 @@ const Header = () => {
           placeholder="Add a new todo..."
           value={newTodo}
           onChange={e => setNewTodo(e.target.value)}
-          className="w-full bg-dark text-gray-100 dark:bg-gray-800 dark:text-gray-100 border-none border-b-2 border-gray-100"
+          className="w-full bg-dark text-gray-100 dark:bg-gray-800 dark:text-gray-100"
         />
         <Button
           onClick={handleAddNewTodo}

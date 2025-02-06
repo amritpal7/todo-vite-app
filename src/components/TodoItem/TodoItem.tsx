@@ -2,13 +2,25 @@ import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../store";
 import {
   removeTodo,
-  editTodo,
+  updateTodo,
   toggleCompleteTodo,
 } from "../../slices/todoSlice";
 import { Button } from "../ui/button";
 import { CheckCheck, Edit, Trash, Check, X, Info } from "lucide-react";
 import { useState } from "react";
 import { Input } from "../ui/input";
+import { Priority } from "../../types";
+import {
+  Dialog,
+  DialogHeader,
+  DialogTrigger,
+  DialogDescription,
+  DialogTitle,
+  DialogContent,
+  DialogFooter,
+} from "../ui/dialog";
+import {} from "@radix-ui/react-dialog";
+import { Select, SelectTrigger, SelectContent, SelectItem } from "../ui/select";
 
 const TodoItem = () => {
   const todos = useSelector((state: RootState) => state.todos.todos);
@@ -19,19 +31,25 @@ const TodoItem = () => {
 
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editText, setEditText] = useState("");
+  const [priority, setPriority] = useState<Priority>("None");
 
   const handleRemoveTodo = (id: string) => {
     dispatch(removeTodo(id));
   };
 
-  const handleEditTodo = (id: string, text: string) => {
+  const handleEditTodo = (
+    id: string,
+    text: string,
+    currentPriority: Priority
+  ) => {
     setEditingId(id);
     setEditText(text);
+    setPriority(currentPriority);
   };
 
   const handleUpdateTodo = (id: string) => {
     if (!editText.trim()) return;
-    dispatch(editTodo({ id, updatedTodo: editText }));
+    dispatch(updateTodo({ id, updatedTodo: editText, priority }));
     setEditingId(null);
   };
 
@@ -88,15 +106,69 @@ const TodoItem = () => {
                 >
                   {todo.text}
                 </span>
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button className="hover:bg-wine">
+                      <Info />
+                    </Button>
+                  </DialogTrigger>
+                  <DialogHeader>
+                    <DialogTitle>Todo Info</DialogTitle>
+                    <DialogDescription>
+                      Make changes to your todo here. Click save when you're
+                      done.
+                    </DialogDescription>
+                  </DialogHeader>
+                  <DialogContent>
+                    <Input
+                      type="text"
+                      value={editText}
+                      onChange={e => setEditText(e.target.value)}
+                      className="dark:bg-gray-700 text-gray-100 w-full"
+                    />
+                    <Select
+                      value={priority}
+                      // onValueChange={setPriority}
+                    >
+                      <SelectTrigger>Priority: {priority}</SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="High">High</SelectItem>
+                        <SelectItem value="Medium">Medium</SelectItem>
+                        <SelectItem value="Low">Low</SelectItem>
+                        <SelectItem value="None">None</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <DialogFooter>
+                      <Button
+                        variant="ghost"
+                        onClick={() => setEditingId(null)}
+                      >
+                        <X size={16} />
+                      </Button>
+                      <Button onClick={() => handleUpdateTodo(todo.id)}>
+                        <CheckCheck size={16} /> Save
+                      </Button>
+                      <Button
+                        variant="destructive"
+                        onClick={() => handleRemoveTodo(todo.id)}
+                      >
+                        <Trash size={16} /> Delete
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        onClick={() => handleCompleteTodo(todo.id)}
+                      >
+                        {todo.completed ? "Mark Incomplete" : "Mark Complete"}
+                      </Button>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
                 <div className="flex gap-1 ml-2">
-                  <Button className="hover:bg-wine">
-                    <Info />
-                  </Button>
                   <Button
                     className="hover:bg-wine"
                     variant="ghost"
                     size="icon"
-                    onClick={() => handleEditTodo(todo.id, todo.text)}
+                    // onClick={() => handleEditTodo(todo.id, todo.text)}
                   >
                     <Edit size={16} />
                   </Button>
