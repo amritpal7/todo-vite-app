@@ -12,7 +12,7 @@ function App() {
           <TodosList />
         </main>
 
-        <footer>
+        <footer className="dark:text-white text-dark">
           <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 p-4 rounded shadow-md">
             {/* Fixed position, centered */}
             <p className="flex items-center justify-center">

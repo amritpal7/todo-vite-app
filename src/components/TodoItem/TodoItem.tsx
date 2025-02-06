@@ -97,7 +97,7 @@ const TodoItem = () => {
         filteredTodos.map(todo => (
           <li
             key={todo.id}
-            className={`flex items-center justify-between bg-gray-800 text-white p-3 rounded-lg shadow-md border-l-2 ${getPriorityBorder(
+            className={`flex items-center justify-between bg-gray-800 dark:text-white text-dark p-3 rounded-lg shadow-md border-l-2 ${getPriorityBorder(
               todo.priority
             )} transition-all duration-300 ease-in-out hover:shadow-2xl`}
           >
