@@ -24,6 +24,7 @@ const todoSlice = createSlice({
         text: action.payload.newTodo,
         completed: false,
         priority: action.payload.priority,
+        createdAt: new Date().toISOString(),
       };
       state.todos.push(getNewTodo);
       localStorage.setItem("todos", JSON.stringify(state.todos));

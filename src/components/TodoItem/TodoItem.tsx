@@ -26,6 +26,7 @@ import {
   SelectItem,
   SelectValue,
 } from "../ui/select";
+import { format } from "date-fns";
 
 const getPriorityBorder = (priority: Priority) => {
   switch (priority) {
@@ -51,6 +52,10 @@ const TodoItem = () => {
   const [editText, setEditText] = useState("");
   const [priority, setPriority] = useState<Priority>("None");
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const dateAndTime = (dateString: string) => {
+    return format(new Date(dateString), "MMM d, yyyy • hh:mm a");
+  };
 
   const handleRemoveTodo = (id: string) => {
     dispatch(removeTodo(id));
@@ -123,8 +128,11 @@ const TodoItem = () => {
                   <DialogContent className="bg-gray-800 bg-opacity-100 text-white shadow-lg outline-none">
                     <DialogHeader>
                       <DialogTitle>Update Todo</DialogTitle>
-                      <DialogDescription>
-                        Edit your todo and priority.
+                      <DialogDescription className="flex justify-between items-center">
+                        <h3>Edit your todo and priority.</h3>
+                        <p className="text-xs text-gray-400 mt-1">
+                          Added on: {dateAndTime(todo.createdAt)}
+                        </p>
                       </DialogDescription>
                     </DialogHeader>
 
