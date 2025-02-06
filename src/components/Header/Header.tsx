@@ -1,7 +1,6 @@
 import { Button } from "../ui/button";
-import { Dialog, DialogContent, DialogTrigger } from "../ui/dialog";
 import { Input } from "../ui/input";
-import { Plus, Calendar, Clock } from "lucide-react";
+import { Plus } from "lucide-react";
 import { addTodo } from "../../slices/todoSlice";
 import { useDispatch } from "react-redux";
 import { useState } from "react";
@@ -29,7 +28,7 @@ const Header = () => {
           placeholder="Add a new todo..."
           value={newTodo}
           onChange={e => setNewTodo(e.target.value)}
-          className="w-full bg-dark text-gray-100 dark:bg-gray-800 dark:text-gray-100"
+          className="w-full bg-dark text-gray-100 dark:bg-gray-800 dark:text-gray-100 focus:border-b focus:border-indigo-500 focus:outline-hidden"
         />
         <Button
           onClick={handleAddNewTodo}
