@@ -6,12 +6,15 @@ import {
   toggleCompleteTodo,
 } from "../../slices/todoSlice";
 import { Button } from "../ui/button";
-import { CheckCheck, Edit, Trash, Check, X } from "lucide-react";
+import { CheckCheck, Edit, Trash, Check, X, Info } from "lucide-react";
 import { useState } from "react";
 import { Input } from "../ui/input";
 
 const TodoItem = () => {
   const todos = useSelector((state: RootState) => state.todos.todos);
+  const searchQuery = useSelector(
+    (state: RootState) => state.todos.searchQuery
+  );
   const dispatch = useDispatch();
 
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -36,17 +39,21 @@ const TodoItem = () => {
     dispatch(toggleCompleteTodo(id));
   };
 
+  const filteredTodos = todos.filter(todo =>
+    todo.text.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   return (
-    <div className="space-y-4 mt-3 cursor-pointer  max-h-[400px] overflow-y-scroll relative">
+    <div className="space-y-4 mt-3 cursor-pointer max-h-[500px] overflow-y-auto">
       {todos.length === 0 ? (
         <li className="bg-gray-800 text-gray-900 p-3 rounded-lg shadow-md bg-gray">
           No todos yet, add one to see!
         </li>
       ) : (
-        todos.map(todo => (
+        filteredTodos.map(todo => (
           <li
             key={todo.id}
-            className={`flex items-center justify-between bg-gray-800 text-white p-3 rounded-lg shadow-md bg-gray border-l-2 border-red-500 hover:scale-105 transition-transform duration-200 will-change-transform relative z-0`}
+            className="flex items-center justify-between bg-gray-800 text-white p-3 rounded-lg shadow-md border-l-2 border-gray-100 transition-all duration-300 ease-in-out hover:shadow-2xl"
           >
             {editingId === todo.id ? (
               <div className="flex items-center gap-2 w-full">
@@ -54,7 +61,7 @@ const TodoItem = () => {
                   type="text"
                   value={editText}
                   onChange={e => setEditText(e.target.value)}
-                  className="bg-gray-700 text-white w-full"
+                  className="dark:bg-gray-700 text-gray-100 w-full"
                 />
                 <Button
                   className="hover:bg-wine"
@@ -73,16 +80,20 @@ const TodoItem = () => {
             ) : (
               <>
                 <span
-                  className={`flex-1 ${
+                  className={`flex-1 ml-1 ${
                     todo.completed
-                      ? "line-through decoration-wavy decoration-red-300 text-red-900"
+                      ? "line-through decoration-wavy decoration-wine text-red-400"
                       : ""
                   }`}
                 >
                   {todo.text}
                 </span>
-                <div className="flex gap-1">
+                <div className="flex gap-1 ml-2">
+                  <Button className="hover:bg-wine">
+                    <Info />
+                  </Button>
                   <Button
+                    className="hover:bg-wine"
                     variant="ghost"
                     size="icon"
                     onClick={() => handleEditTodo(todo.id, todo.text)}
@@ -90,6 +101,7 @@ const TodoItem = () => {
                     <Edit size={16} />
                   </Button>
                   <Button
+                    className="hover:bg-wine"
                     variant="ghost"
                     size="icon"
                     onClick={() => handleCompleteTodo(todo.id)}
@@ -97,6 +109,7 @@ const TodoItem = () => {
                     <CheckCheck size={16} />
                   </Button>
                   <Button
+                    className="hover:bg-red-500"
                     variant="destructive"
                     size="icon"
                     onClick={() => handleRemoveTodo(todo.id)}
@@ -104,17 +117,6 @@ const TodoItem = () => {
                     <Trash size={16} />
                   </Button>
                 </div>
-                {/* Fix Scaling Issue */}
-                <style>
-                  {`
-                li:hover {
-                  transform: scale(1.05);
-                  z-index: 10;
-                  position: absolute;
-                  width: 100%;
-                }
-              `}
-                </style>
               </>
             )}
           </li>

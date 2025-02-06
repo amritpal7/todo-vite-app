@@ -3,10 +3,12 @@ import { Todo } from "../types";
 
 interface TodoState {
   todos: Todo[];
+  searchQuery: string;
 }
 
 const initialState: TodoState = {
   todos: [],
+  searchQuery: "",
 };
 
 const todoSlice = createSlice({
@@ -45,9 +47,19 @@ const todoSlice = createSlice({
     removeTodo: (state, action: PayloadAction<string>) => {
       state.todos = state.todos.filter(todo => todo.id !== action.payload);
     },
+
+    setSearchQuery: (state, action: PayloadAction<string>) => {
+      state.searchQuery = action.payload;
+    },
   },
 });
 
-export const { addTodo, removeTodo, editTodo, toggleCompleteTodo } =
-  todoSlice.actions;
+export const {
+  addTodo,
+  removeTodo,
+  editTodo,
+  toggleCompleteTodo,
+  setSearchQuery,
+} = todoSlice.actions;
+
 export default todoSlice.reducer;
