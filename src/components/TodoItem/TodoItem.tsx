@@ -6,7 +6,7 @@ import {
   toggleCompleteTodo,
 } from "../../slices/todoSlice";
 import { Button } from "../ui/button";
-import { CheckCheck, Edit, Trash, Check, X, Info } from "lucide-react";
+import { CheckCheck, Edit, Trash } from "lucide-react";
 import { useState } from "react";
 import { Input } from "../ui/input";
 import { Priority } from "../../types";
