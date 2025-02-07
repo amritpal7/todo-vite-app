@@ -6,4 +6,12 @@ export interface Todo {
   completed: boolean;
   priority: Priority;
   createdAt: string;
+  updatedAt?: string;
+}
+
+export interface TodoHistory {
+  action: string;
+  timeStamp: string;
+  todo: Todo;
+  previousTodo?: Todo; // Used for updates to track changes
 }

@@ -5,6 +5,7 @@ import ModeToggle from "../mode-toggle";
 import React from "react";
 import { setSearchQuery } from "../../slices/todoSlice";
 import { useDispatch } from "react-redux";
+import HistoryModal from "../HistoryModal/HistoryModal";
 
 const Navbar = () => {
   const dispatch = useDispatch();
@@ -32,6 +33,7 @@ const Navbar = () => {
         </div>
 
         <Button variant="ghost">
+          <HistoryModal />
           <ModeToggle />
         </Button>
       </div>

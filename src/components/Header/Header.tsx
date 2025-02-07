@@ -28,7 +28,7 @@ const Header = () => {
           placeholder="Add a new todo..."
           value={newTodo}
           onChange={e => setNewTodo(e.target.value)}
-          className="w-full bg-wine text-gray-100 dark:bg-gray-800 dark:text-gray-100 focus:border-b focus:border-indigo-500 focus:outline-hidden"
+          className="w-full bg-transparent text-dark dark:bg-gray-800 dark:text-white border-b-2 border-transparent focus:border-white focus:animate-gradientBorder outline-none"
         />
         <Button
           onClick={handleAddNewTodo}

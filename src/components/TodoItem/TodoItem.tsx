@@ -26,7 +26,7 @@ import {
   SelectItem,
   SelectValue,
 } from "../ui/select";
-import { format } from "date-fns";
+import { format, isValid, parseISO } from "date-fns";
 
 const getPriorityBorder = (priority: Priority) => {
   switch (priority) {
@@ -53,8 +53,12 @@ const TodoItem = () => {
   const [priority, setPriority] = useState<Priority>("None");
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const dateAndTime = (dateString: string) => {
-    return format(new Date(dateString), "MMM d, yyyy • hh:mm a");
+  const dateAndTime = (dateString: string | undefined) => {
+    if (!dateString) return "N/A";
+    const parsedDate = parseISO(dateString);
+    return isValid(parsedDate)
+      ? format(parsedDate, "MMM d, yyyy • hh:mm a")
+      : "Invalid date!";
   };
 
   const handleRemoveTodo = (id: string) => {
@@ -114,7 +118,7 @@ const TodoItem = () => {
               <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
                 <DialogTrigger asChild>
                   <Button
-                    className="hover:bg-wine"
+                    className="hover:bg-gray-700 dark:text-white"
                     variant="ghost"
                     size="icon"
                     onClick={() =>
@@ -125,14 +129,21 @@ const TodoItem = () => {
                   </Button>
                 </DialogTrigger>
                 {editingId === todo.id && (
-                  <DialogContent className="bg-gray-800 bg-opacity-100 text-white shadow-lg outline-none">
+                  <DialogContent className="dark:bg-gray-900 dark:text-white border border-gray-700 backdrop-blur-md shadow-2xl rounded-xlß">
                     <DialogHeader>
                       <DialogTitle>Update Todo</DialogTitle>
                       <DialogDescription className="flex justify-between items-center">
                         <h3>Edit your todo and priority.</h3>
-                        <p className="text-xs text-gray-400 mt-1">
-                          Added on: {dateAndTime(todo.createdAt)}
-                        </p>
+                        <div className="grid grid-col">
+                          <span className="text-xs text-gray-400 mt-1">
+                            Last added: {dateAndTime(todo.createdAt)}
+                          </span>
+                          {todo.updatedAt && (
+                            <span className="text-xs text-gray-400 mt-1">
+                              Last updated: {dateAndTime(todo.updatedAt)}
+                            </span>
+                          )}
+                        </div>
                       </DialogDescription>
                     </DialogHeader>
 
@@ -161,13 +172,13 @@ const TodoItem = () => {
 
                     <DialogFooter>
                       <Button
-                        className="hover:bg-wine"
+                        className="hover:bg-gray-700 dark:text-white"
                         onClick={() => handleUpdateTodo(todo.id)}
                       >
                         Save
                       </Button>
                       <Button
-                        className="hover:bg-gray-600"
+                        className="hover:bg-gray-600 dark:text-white"
                         onClick={() => setEditingId(null)}
                       >
                         Cancel
@@ -177,7 +188,7 @@ const TodoItem = () => {
                 )}
               </Dialog>
               <Button
-                className="hover:bg-wine"
+                className="hover:bg-gray-700 dark:text-white"
                 variant="ghost"
                 size="icon"
                 onClick={() => handleCompleteTodo(todo.id)}
@@ -185,7 +196,7 @@ const TodoItem = () => {
                 <CheckCheck size={16} />
               </Button>
               <Button
-                className="hover:bg-red-500"
+                className="hover:bg-red-500 dark:text-white"
                 variant="destructive"
                 size="icon"
                 onClick={() => handleRemoveTodo(todo.id)}
