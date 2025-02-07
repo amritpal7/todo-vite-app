@@ -12,22 +12,22 @@ function App() {
           <TodosList />
         </main>
 
-        <footer>
+        <footer className="dark:text-white text-dark">
           <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 p-4 rounded shadow-md">
             {/* Fixed position, centered */}
             <p className="flex items-center justify-center">
               <label className="mr-4">Priorities: </label>
               {"   "}
-              <span className="mr-4 flex items-center border-l border-red-500">
+              <span className="mr-4 flex items-center border-l-4 border-red-500">
                 High
               </span>
-              <span className="mr-4 flex items-center border-l border-indigo-500">
+              <span className="mr-4 flex items-center border-l-4 border-indigo-500">
                 Medium
               </span>
-              <span className="mr-4 flex items-center border-l border-yellow-500">
+              <span className="mr-4 flex items-center border-l-4 border-yellow-500">
                 Low
               </span>
-              <span className="flex items-center border-l border-gray-100">
+              <span className="flex items-center border-l-4 border-gray-100">
                 None
               </span>
             </p>

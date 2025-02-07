@@ -4,6 +4,16 @@ module.exports = {
   content: ["./index.html", "./src/**/*.{ts,tsx,js,jsx}"],
   theme: {
     extend: {
+      keyframes: {
+        gradientBorder: {
+          "0%": { borderColor: "white" },
+          "50%": { borderColor: "#b11226" }, // Wine color
+          "100%": { borderColor: "#ff69b4" }, // Pink color
+        },
+      },
+      animation: {
+        gradientBorder: "gradientBorder 1s ease-in-out infinite",
+      },
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
