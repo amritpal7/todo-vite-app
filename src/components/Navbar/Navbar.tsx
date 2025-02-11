@@ -1,5 +1,4 @@
 import { Input } from "../ui/input";
-import { Button } from "../ui/button";
 import { Search, ListTodo } from "lucide-react";
 import ModeToggle from "../mode-toggle";
 import React from "react";
