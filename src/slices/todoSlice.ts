@@ -1,6 +1,7 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { Todo, Priority, TodoHistory } from "../types";
 import { format } from "date-fns";
+import { toast } from "../hooks/use-toast";
 
 interface TodoState {
   todos: Todo[];
@@ -42,6 +43,10 @@ const todoSlice = createSlice({
         todo: { ...getNewTodo },
       });
       saveToLocalStorage(state);
+      toast({
+        title: "Added:",
+        description: `todo ${action.payload.newTodo} has been added`,
+      });
     },
     updateTodo: (
       state,
@@ -70,6 +75,10 @@ const todoSlice = createSlice({
         });
       }
       saveToLocalStorage(state);
+      toast({
+        title: "Updated:",
+        description: `todo '${action.payload.updatedTodo}' has been updated`,
+      });
     },
     toggleCompleteTodo: (state, action: PayloadAction<string>) => {
       const timeStamp = format(new Date(), "yyyy-MM-dd HH:mm:ss");
@@ -88,6 +97,10 @@ const todoSlice = createSlice({
         });
       }
       saveToLocalStorage(state);
+      toast({
+        title: "Toggled:",
+        description: `todo ${action.payload} has been toggled.`,
+      });
     },
 
     removeTodo: (state, action: PayloadAction<string>) => {
@@ -101,6 +114,11 @@ const todoSlice = createSlice({
         });
         state.todos = state.todos.filter(todo => todo.id !== action.payload);
         saveToLocalStorage(state);
+        toast({
+          title: "Deleted:",
+          description: `todo ${removeTodo} has been deleted.`,
+          variant: "destructive",
+        });
       }
     },
 
@@ -111,6 +129,11 @@ const todoSlice = createSlice({
     resetHistory: state => {
       state.history = [];
       saveToLocalStorage(state);
+      toast({
+        title: "History deleted:",
+        description: "All the history has been removed",
+        variant: "destructive",
+      });
     },
   },
 });

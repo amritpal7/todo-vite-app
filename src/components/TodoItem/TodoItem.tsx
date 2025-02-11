@@ -6,19 +6,20 @@ import {
   toggleCompleteTodo,
 } from "../../slices/todoSlice";
 import { Button } from "../ui/button";
-import { CheckCheck, Edit, Trash } from "lucide-react";
+import { CheckCheck, Edit, Save, Trash, XCircle } from "lucide-react";
 import { useState } from "react";
 import { Input } from "../ui/input";
 import { Priority } from "../../types";
 import {
-  Dialog,
-  DialogHeader,
-  DialogTrigger,
-  DialogDescription,
-  DialogTitle,
-  DialogContent,
-  DialogFooter,
-} from "../ui/dialog";
+  Drawer,
+  // DrawerClose,
+  DrawerContent,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from "../ui/drawer";
 import {
   Select,
   SelectTrigger,
@@ -31,13 +32,13 @@ import { format, isValid, parseISO } from "date-fns";
 const getPriorityBorder = (priority: Priority) => {
   switch (priority) {
     case "High":
-      return "border-red-500";
+      return "border-destructive";
     case "Medium":
-      return "border-indigo-500";
+      return "border-primary";
     case "Low":
-      return "border-yellow-500";
+      return "border-accent";
     default:
-      return "border-gray-100";
+      return "border-muted";
   }
 };
 
@@ -92,7 +93,7 @@ const TodoItem = () => {
   );
 
   return (
-    <div className="space-y-4 mt-3 cursor-pointer max-h-[500px] overflow-y-auto">
+    <div className="space-y-4 mt-3 cursor-pointer max-h-[450px] overflow-y-auto">
       {todos.length === 0 ? (
         <li className="bg-gray-800 text-gray-900 p-3 rounded-lg shadow-md bg-gray">
           No todos yet, add one to see!
@@ -101,9 +102,9 @@ const TodoItem = () => {
         filteredTodos.map(todo => (
           <li
             key={todo.id}
-            className={`flex items-center justify-between bg-gray-800 dark:text-white text-dark p-3 rounded-lg shadow-md border-l-2 ${getPriorityBorder(
+            className={`flex items-center justify-between p-3 rounded-lg shadow-md border-l-4 ${getPriorityBorder(
               todo.priority
-            )} transition-all duration-300 ease-in-out hover:shadow-2xl`}
+            )} transition-all duration-300 ease-in-out bg-card text-card-foreground hover:shadow-2xl`}
           >
             <span
               className={`flex-1 ml-1 ${
@@ -115,10 +116,9 @@ const TodoItem = () => {
               {todo.text}
             </span>
             <div className="flex gap-1 ml-2">
-              <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-                <DialogTrigger asChild>
+              <Drawer open={isModalOpen} onOpenChange={setIsModalOpen}>
+                <DrawerTrigger asChild>
                   <Button
-                    className="hover:bg-gray-700 dark:text-white"
                     variant="ghost"
                     size="icon"
                     onClick={() =>
@@ -127,68 +127,79 @@ const TodoItem = () => {
                   >
                     <Edit size={16} />
                   </Button>
-                </DialogTrigger>
+                </DrawerTrigger>
                 {editingId === todo.id && (
-                  <DialogContent className="dark:bg-gray-900 dark:text-white border border-gray-700 backdrop-blur-md shadow-2xl rounded-xlß">
-                    <DialogHeader>
-                      <DialogTitle>Update Todo</DialogTitle>
-                      <DialogDescription className="flex justify-between items-center">
+                  <DrawerContent className="flex items-center justify-center bg-card text-card-foreground border border-border shadow-2xl rounded-xl">
+                    <div className="mx-auto w-full max-w-sm">
+                      <DrawerHeader>
+                        <DrawerTitle className="text-2xl">
+                          Update Todo
+                        </DrawerTitle>
                         <h3>Edit your todo and priority.</h3>
-                        <div className="grid grid-col">
-                          <span className="text-xs text-gray-400 mt-1">
-                            Last added: {dateAndTime(todo.createdAt)}
-                          </span>
-                          {todo.updatedAt && (
-                            <span className="text-xs text-gray-400 mt-1">
-                              Last updated: {dateAndTime(todo.updatedAt)}
+                        <DrawerDescription className="">
+                          <div className="grid grid-col">
+                            <span className="text-xs mt-1">
+                              Last added: {dateAndTime(todo.createdAt)}
                             </span>
-                          )}
-                        </div>
-                      </DialogDescription>
-                    </DialogHeader>
+                            {todo.updatedAt && (
+                              <span className="text-xs mt-1">
+                                Last updated: {dateAndTime(todo.updatedAt)}
+                              </span>
+                            )}
+                          </div>
+                        </DrawerDescription>
+                      </DrawerHeader>
 
-                    <Input
-                      type="text"
-                      value={editText}
-                      onChange={e => setEditText(e.target.value)}
-                      className="dark:bg-gray-700 text-gray-100 w-full"
-                    />
+                      <div>
+                        <Input
+                          type="text"
+                          value={editText}
+                          onChange={e => setEditText(e.target.value)}
+                          className="w-full"
+                        />
 
-                    {/* Priority Selection */}
-                    <Select
-                      value={priority}
-                      onValueChange={value => setPriority(value as Priority)}
-                    >
-                      <SelectTrigger className="dark:bg-gray-700 text-white">
-                        <SelectValue placeholder="Select Priority" />
-                      </SelectTrigger>
-                      <SelectContent className="bg-dark text-white">
-                        <SelectItem value="None">None</SelectItem>
-                        <SelectItem value="Low">Low</SelectItem>
-                        <SelectItem value="Medium">Medium</SelectItem>
-                        <SelectItem value="High">High</SelectItem>
-                      </SelectContent>
-                    </Select>
+                        {/* Priority Selection */}
+                        <Select
+                          value={priority}
+                          onValueChange={value =>
+                            setPriority(value as Priority)
+                          }
+                        >
+                          <SelectTrigger className="bg-background text-foreground">
+                            <SelectValue placeholder="Select Priority" />
+                          </SelectTrigger>
+                          <SelectContent className="bg-background text-foreground">
+                            <SelectItem value="None">None</SelectItem>
+                            <SelectItem value="Low">Low</SelectItem>
+                            <SelectItem value="Medium">Medium</SelectItem>
+                            <SelectItem value="High">High</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
 
-                    <DialogFooter>
-                      <Button
-                        className="hover:bg-gray-700 dark:text-white"
-                        onClick={() => handleUpdateTodo(todo.id)}
-                      >
-                        Save
-                      </Button>
-                      <Button
-                        className="hover:bg-gray-600 dark:text-white"
-                        onClick={() => setEditingId(null)}
-                      >
-                        Cancel
-                      </Button>
-                    </DialogFooter>
-                  </DialogContent>
+                      <DrawerFooter className="flex gap-2">
+                        <Button
+                          className="bg-background text-foreground"
+                          onClick={() => handleUpdateTodo(todo.id)}
+                          variant="ghost"
+                        >
+                          <Save />
+                          Save
+                        </Button>
+                        <Button
+                          className="bg-background text-foreground"
+                          onClick={() => setEditingId(null)}
+                          variant="ghost"
+                        >
+                          <XCircle />
+                          Cancel
+                        </Button>
+                      </DrawerFooter>
+                    </div>
+                  </DrawerContent>
                 )}
-              </Dialog>
+              </Drawer>
               <Button
-                className="hover:bg-gray-700 dark:text-white"
                 variant="ghost"
                 size="icon"
                 onClick={() => handleCompleteTodo(todo.id)}
@@ -196,8 +207,8 @@ const TodoItem = () => {
                 <CheckCheck size={16} />
               </Button>
               <Button
-                className="hover:bg-red-500 dark:text-white"
-                variant="destructive"
+                className="hover:bg-destructive"
+                variant="ghost"
                 size="icon"
                 onClick={() => handleRemoveTodo(todo.id)}
               >

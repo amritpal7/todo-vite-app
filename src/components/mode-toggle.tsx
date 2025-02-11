@@ -6,7 +6,12 @@ const ModeToggle = () => {
   const { theme, toggleTheme } = useTheme();
 
   return (
-    <Button onClick={toggleTheme} variant="ghost">
+    <Button
+      onClick={toggleTheme}
+      className="bg-background text-foreground rounded-full"
+      variant="ghost"
+      size="sm"
+    >
       {theme === "dark" ? (
         <Sun className="w-5 h-5" />
       ) : (

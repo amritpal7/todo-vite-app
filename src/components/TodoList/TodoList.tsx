@@ -5,7 +5,7 @@ const TodosList = () => {
   return (
     <div className="w-full">
       <Header />
-      <ul className="">
+      <ul>
         <TodoItem />
       </ul>
     </div>
