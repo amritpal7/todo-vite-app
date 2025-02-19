@@ -124,9 +124,9 @@ const TodoItem = () => {
           </label>
         ))}
       </div>
-      <div className="space-y-4 mt-3 cursor-pointer max-h-[450px] overflow-y-auto">
+      <div className="space-y-4 mt-3 max-h-[400px] overflow-y-auto">
         {todos.length === 0 ? (
-          <li className="bg-gray-800 text-gray-900 p-3 rounded-lg shadow-md bg-gray">
+          <li className="bg-muted text-muted-foreground p-3 rounded-lg shadow-md text-center">
             No todos yet, add one to see!
           </li>
         ) : (

@@ -27,7 +27,7 @@ const Navbar = () => {
             onChange={e => handleSearchTodoInput(e)}
             type="text"
             placeholder="Search todos..."
-            className="h-10 p-2 bg-background text-foreground w-full md:w-64 border-none"
+            className="h-10 p-2 bg-background text-foreground w-full md:w-64 border-0 border-b-2 border-border focus:border-b-accent focus:ring-0 focus-visible:outline-none focus-visible:ring-0"
           />
         </div>
 
