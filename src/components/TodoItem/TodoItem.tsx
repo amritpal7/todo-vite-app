@@ -126,9 +126,11 @@ const TodoItem = () => {
       </div>
       <div className="space-y-4 mt-3 max-h-[400px] overflow-y-auto">
         {todos.length === 0 ? (
-          <li className="bg-muted text-muted-foreground p-3 rounded-lg shadow-md text-center">
-            No todos yet, add one to see!
-          </li>
+          <div className="flex justify-center items-center h-[60vh]">
+            <li className="bg-muted text-muted-foreground p-3 rounded-lg shadow-md text-center text-5xl">
+              No todos yet, add one to see!
+            </li>
+          </div>
         ) : (
           filteredTodos.map(todo => (
             <li

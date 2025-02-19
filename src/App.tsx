@@ -10,7 +10,7 @@ function App() {
 
   return (
     <ThemeProvider>
-      <div className="min-h-screen bg-background text-foreground">
+      <div className="min-h-screen bg-background text-foreground font-sans">
         <Navbar />
         <main className="max-w-3xl mx-auto p-4">
           <TodosList />

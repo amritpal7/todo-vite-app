@@ -15,9 +15,9 @@ const Navbar = () => {
   };
   return (
     <nav className="bg-background text-foreground p-2 flex flex-col md:flex-row items-center justify-between gap-2 shadow-xl">
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 scroll-m-20 text-3xl font-extrabold tracking-tight lg:text-4xl">
         <ListTodo />
-        <h1 className="text-xl font-bold">Todo App</h1>
+        <h1 className="">Todos App</h1>
       </div>
 
       <div className="flex gap-2">
