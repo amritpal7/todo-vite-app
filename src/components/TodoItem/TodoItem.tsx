@@ -27,6 +27,7 @@ import {
   SelectItem,
   SelectValue,
 } from "../ui/select";
+import { Tabs, TabsContent, TabsTrigger, TabsList } from "../ui/tabs";
 import { format, isValid, parseISO } from "date-fns";
 
 const getPriorityBorder = (priority: Priority) => {
@@ -108,149 +109,165 @@ const TodoItem = () => {
 
   return (
     <div>
-      <div className="flex items-center justify-between">
-        {["All", "Completed", "Pending"].map(status => (
-          <label htmlFor="filter" key={status}>
-            <input
-              className="form-radio"
-              id={`filter-${status}`}
-              type="radio"
-              name="filter"
-              value={status}
-              checked={filter === status}
-              onChange={() => setFilter(status)}
-            />
-            <span>{status}</span>
-          </label>
-        ))}
-      </div>
-      <div className="space-y-4 mt-3 max-h-[400px] overflow-y-auto">
-        {todos.length === 0 ? (
-          <div className="flex justify-center items-center h-[60vh]">
-            <li className="bg-muted text-muted-foreground p-3 rounded-lg shadow-md text-center text-5xl">
-              No todos yet, add one to see!
-            </li>
-          </div>
-        ) : (
-          filteredTodos.map(todo => (
-            <li
-              key={todo.id}
-              className={`flex items-center justify-between p-3 rounded-lg shadow-md border-l-4 ${getPriorityBorder(
-                todo.priority
-              )} transition-all duration-300 ease-in-out bg-card text-card-foreground hover:shadow-2xl`}
-            >
-              <span
-                className={`flex-1 ml-1 ${
-                  todo.completed
-                    ? "line-through decoration-wavy decoration-wine text-red-400"
-                    : ""
-                }`}
+      <div className="max-w-2xl mx-auto p-6 bg-card text-card-foreground rounded-xl shadow-lg">
+        <Tabs defaultValue="All" onValueChange={setFilter} className="w-full">
+          <TabsList className="flex justify-between bg-muted rounded-md p-1">
+            {["All", "Completed", "Pending"].map(status => (
+              <TabsTrigger
+                key={status}
+                value={status}
+                className="w-full py-2 text-lg font-medium data-[state=active]:bg-card data-[state=active]:text-accent data-[state=active]:shadow-sm"
+                onClick={() => setFilter(status)}
               >
-                {todo.text}
-              </span>
-              <div className="flex gap-1 ml-2">
-                <Drawer open={isModalOpen} onOpenChange={setIsModalOpen}>
-                  <DrawerTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() =>
-                        handleEditTodo(todo.id, todo.text, todo.priority)
-                      }
+                {status}
+              </TabsTrigger>
+            ))}
+          </TabsList>
+          <TabsContent value={filter}>
+            <div className="space-y-4 mt-3 max-h-[400px] overflow-y-auto">
+              {todos.length === 0 ? (
+                <div className="flex justify-center items-center h-[60vh]">
+                  <li className="text-muted-foreground p-3 rounded-lg shadow-md text-center text-5xl">
+                    No todos yet, add one to see!
+                  </li>
+                </div>
+              ) : (
+                filteredTodos
+                  .slice()
+                  .reverse()
+                  .map(todo => (
+                    <li
+                      key={todo.id}
+                      className={`flex items-center justify-between p-3 rounded-lg shadow-md border-l-4 ${getPriorityBorder(
+                        todo.priority
+                      )} transition-all duration-300 ease-in-out bg-card text-card-foreground hover:scale-80`}
                     >
-                      <Edit size={16} />
-                    </Button>
-                  </DrawerTrigger>
-                  {editingId === todo.id && (
-                    <DrawerContent className="flex items-center justify-center bg-card text-card-foreground border border-border shadow-2xl rounded-xl">
-                      <div className="mx-auto w-full max-w-sm">
-                        <DrawerHeader>
-                          <DrawerTitle className="text-2xl">
-                            Update Todo
-                          </DrawerTitle>
-                          <h3>Edit your todo and priority.</h3>
-                          <DrawerDescription className="">
-                            <div className="grid grid-col">
-                              <span className="text-xs mt-1">
-                                Last added: {dateAndTime(todo.createdAt)}
-                              </span>
-                              {todo.updatedAt && (
-                                <span className="text-xs mt-1">
-                                  Last updated: {dateAndTime(todo.updatedAt)}
-                                </span>
-                              )}
-                            </div>
-                          </DrawerDescription>
-                        </DrawerHeader>
+                      <span
+                        className={`flex-1 ml-1 ${
+                          todo.completed
+                            ? "line-through decoration-wavy decoration-wine text-red-400"
+                            : ""
+                        }`}
+                      >
+                        {todo.text}
+                      </span>
+                      <div className="flex gap-1 ml-2">
+                        <Drawer
+                          open={isModalOpen}
+                          onOpenChange={setIsModalOpen}
+                        >
+                          <DrawerTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() =>
+                                handleEditTodo(
+                                  todo.id,
+                                  todo.text,
+                                  todo.priority
+                                )
+                              }
+                            >
+                              <Edit size={16} />
+                            </Button>
+                          </DrawerTrigger>
+                          {editingId === todo.id && (
+                            <DrawerContent className="flex items-center justify-center bg-card text-card-foreground border border-border shadow-2xl rounded-xl">
+                              <div className="mx-auto w-full max-w-sm">
+                                <DrawerHeader>
+                                  <DrawerTitle className="text-2xl">
+                                    Update Todo
+                                  </DrawerTitle>
+                                  <h3>Edit your todo and priority.</h3>
+                                  <DrawerDescription className="">
+                                    <div className="grid grid-col">
+                                      <span className="text-xs mt-1">
+                                        Last added:{" "}
+                                        {dateAndTime(todo.createdAt)}
+                                      </span>
+                                      {todo.updatedAt && (
+                                        <span className="text-xs mt-1">
+                                          Last updated:{" "}
+                                          {dateAndTime(todo.updatedAt)}
+                                        </span>
+                                      )}
+                                    </div>
+                                  </DrawerDescription>
+                                </DrawerHeader>
 
-                        <div>
-                          <Input
-                            type="text"
-                            value={editText}
-                            onChange={e => setEditText(e.target.value)}
-                            className="w-full"
-                          />
+                                <div>
+                                  <Input
+                                    type="text"
+                                    value={editText}
+                                    onChange={e => setEditText(e.target.value)}
+                                    className="w-full"
+                                  />
 
-                          {/* Priority Selection */}
-                          <Select
-                            value={priority}
-                            onValueChange={value =>
-                              setPriority(value as Priority)
-                            }
-                          >
-                            <SelectTrigger className="bg-background text-foreground">
-                              <SelectValue placeholder="Select Priority" />
-                            </SelectTrigger>
-                            <SelectContent className="bg-background text-foreground">
-                              <SelectItem value="None">None</SelectItem>
-                              <SelectItem value="Low">Low</SelectItem>
-                              <SelectItem value="Medium">Medium</SelectItem>
-                              <SelectItem value="High">High</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
+                                  {/* Priority Selection */}
+                                  <Select
+                                    value={priority}
+                                    onValueChange={value =>
+                                      setPriority(value as Priority)
+                                    }
+                                  >
+                                    <SelectTrigger className="bg-background text-foreground">
+                                      <SelectValue placeholder="Select Priority" />
+                                    </SelectTrigger>
+                                    <SelectContent className="bg-background text-foreground">
+                                      <SelectItem value="None">None</SelectItem>
+                                      <SelectItem value="Low">Low</SelectItem>
+                                      <SelectItem value="Medium">
+                                        Medium
+                                      </SelectItem>
+                                      <SelectItem value="High">High</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                </div>
 
-                        <DrawerFooter className="flex gap-2">
-                          <Button
-                            className="bg-background text-foreground"
-                            onClick={() => handleUpdateTodo(todo.id)}
-                            variant="ghost"
-                          >
-                            <Save />
-                            Save
-                          </Button>
-                          <Button
-                            className="bg-background text-foreground"
-                            onClick={() => setEditingId(null)}
-                            variant="ghost"
-                          >
-                            <XCircle />
-                            Cancel
-                          </Button>
-                        </DrawerFooter>
+                                <DrawerFooter className="flex gap-2">
+                                  <Button
+                                    className="bg-background text-foreground"
+                                    onClick={() => handleUpdateTodo(todo.id)}
+                                    variant="ghost"
+                                  >
+                                    <Save />
+                                    Save
+                                  </Button>
+                                  <Button
+                                    className="bg-background text-foreground"
+                                    onClick={() => setEditingId(null)}
+                                    variant="ghost"
+                                  >
+                                    <XCircle />
+                                    Cancel
+                                  </Button>
+                                </DrawerFooter>
+                              </div>
+                            </DrawerContent>
+                          )}
+                        </Drawer>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleCompleteTodo(todo.id)}
+                        >
+                          <CheckCheck size={16} />
+                        </Button>
+                        <Button
+                          className="hover:bg-destructive"
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleRemoveTodo(todo.id)}
+                        >
+                          <Trash size={16} />
+                        </Button>
                       </div>
-                    </DrawerContent>
-                  )}
-                </Drawer>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => handleCompleteTodo(todo.id)}
-                >
-                  <CheckCheck size={16} />
-                </Button>
-                <Button
-                  className="hover:bg-destructive"
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => handleRemoveTodo(todo.id)}
-                >
-                  <Trash size={16} />
-                </Button>
-              </div>
-            </li>
-          ))
-        )}
+                    </li>
+                  ))
+              )}
+            </div>
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );
