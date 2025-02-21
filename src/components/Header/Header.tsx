@@ -6,9 +6,9 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Plus } from "lucide-react";
 import { addTodo } from "../../slices/todoSlice";
-import { useDispatch } from "react-redux";
 import { useEffect, useRef } from "react";
 import { Priority } from "../../types";
+import { useAppDispatch } from "../../hooks";
 
 const todoSchema = z.object({
   newTodo: z.string().nonempty("Todo cannot be empty"),
@@ -29,7 +29,7 @@ const Header = () => {
     inputRef.current?.focus();
   }, []);
 
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
   const handleTodoSubmit = (data: { newTodo: string; priority: Priority }) => {
     dispatch(addTodo({ newTodo: data.newTodo, priority: data.priority }));

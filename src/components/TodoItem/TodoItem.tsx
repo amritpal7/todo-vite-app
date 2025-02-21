@@ -1,13 +1,14 @@
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { RootState } from "../../store";
 import {
+  fetchTodos,
   removeTodo,
   updateTodo,
   toggleCompleteTodo,
 } from "../../slices/todoSlice";
 import { Button } from "../ui/button";
 import { CheckCheck, Edit, Save, Trash, XCircle } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Input } from "../ui/input";
 import { Priority } from "../../types";
 import {
@@ -29,6 +30,7 @@ import {
 } from "../ui/select";
 import { Tabs, TabsContent, TabsTrigger, TabsList } from "../ui/tabs";
 import { format, isValid, parseISO } from "date-fns";
+import { useAppDispatch } from "../../hooks";
 
 const getPriorityBorder = (priority: Priority) => {
   switch (priority) {
@@ -48,7 +50,7 @@ const TodoItem = () => {
   const searchQuery = useSelector(
     (state: RootState) => state.todos.searchQuery
   );
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editText, setEditText] = useState("");
@@ -63,6 +65,10 @@ const TodoItem = () => {
       ? format(parsedDate, "MMM d, yyyy • hh:mm a")
       : "Invalid date!";
   };
+
+  useEffect(() => {
+    dispatch(fetchTodos());
+  }, []);
 
   const handleRemoveTodo = (id: string) => {
     dispatch(removeTodo(id));
@@ -183,7 +189,7 @@ const TodoItem = () => {
                                     <div className="grid grid-col">
                                       <span className="text-xs mt-1">
                                         Last added:{" "}
-                                        {dateAndTime(todo.createdAt)}
+                                        {dateAndTime(todo.created_at)}
                                       </span>
                                       {todo.updatedAt && (
                                         <span className="text-xs mt-1">

@@ -1,4 +1,4 @@
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { RootState } from "../../store";
 import {
   Dialog,
@@ -8,15 +8,22 @@ import {
   DialogTitle,
   DialogDescription,
 } from "../ui/dialog";
-import { resetHistory } from "../../slices/todoSlice";
+import { resetHistory, fetchHistory } from "../../slices/todoSlice";
 import { Button } from "../ui/button";
 import { History, Trash2, XCircle } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useAppDispatch } from "../../hooks";
+import { format, parseISO } from "date-fns";
 
 const HistoryModal = () => {
   const history = useSelector((state: RootState) => state.todos.history);
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const [confirmOpen, setConfirmOpen] = useState(false);
+
+  useEffect(() => {
+    dispatch(fetchHistory());
+    console.log(fetchHistory());
+  }, [dispatch]);
 
   const handleResetHistory = () => {
     dispatch(resetHistory());
@@ -68,35 +75,48 @@ const HistoryModal = () => {
               history
                 .slice()
                 .reverse()
-                .map((entry, index) => (
+                .map(entry => (
                   <div
-                    key={index}
+                    key={`${entry.todo_id} - ${entry.timeStamp}`}
                     className="p-4 rounded-md bg-muted text-card-foreground shadow-md"
                   >
                     <p className="text-sm">
-                      <span className="font-bold">{entry.action}</span> -{" "}
-                      <span className="text-foreground">{entry.timeStamp}</span>
+                      <span className="font-bold">
+                        {entry.action.toUpperCase()}
+                      </span>{" "}
+                      -{" "}
+                      <span className="text-muted-foreground text-[12px]">
+                        {format(parseISO(entry.timeStamp), "PPpp")}
+                      </span>
                     </p>
-                    <p className="text-sm">
-                      <strong className="text-foreground">Todo:</strong>{" "}
-                      {entry.todo.text}
+                    <p className="bold">
+                      Todo:{" "}
+                      <span className="text-accent text-sm">
+                        {entry.new_text !== null
+                          ? entry.new_text
+                          : entry.previous_text}
+                      </span>
                     </p>
-                    {entry.previousTodo && (
-                      <>
-                        <p className="text-sm">
-                          <span className="text-muted-foreground">Before:</span>{" "}
-                          {entry.previousTodo.text}
-                        </p>
-                        {entry.previousTodo.priority !==
-                          entry.todo.priority && (
-                          <p className="text-sm text-destructive">
-                            Priority changed from{" "}
-                            <strong>{entry.previousTodo.priority}</strong> to{" "}
-                            <strong>{entry.todo.priority}</strong>
+
+                    {entry.new_text &&
+                      entry.new_text !== entry.previous_text && (
+                        <>
+                          <p className="text-sm text-muted-foreground">
+                            <strong>Now:</strong> {entry.new_text}
                           </p>
-                        )}
-                      </>
-                    )}
+                          <p className="text-sm text-muted-foreground">
+                            <span>Before:</span> {entry.previous_text}
+                          </p>
+                        </>
+                      )}
+                    {entry.new_priority &&
+                      entry.new_priority !== entry.previous_priority && (
+                        <p className="text-sm text-destructive">
+                          Priority changed from{" "}
+                          <strong>{entry.previous_priority}</strong> to{" "}
+                          <strong>{entry.new_priority}</strong>
+                        </p>
+                      )}
                   </div>
                 ))
             )}
