@@ -1,6 +1,5 @@
 import { Input } from "../ui/input";
-import { Button } from "../ui/button";
-import { Search, LayoutList } from "lucide-react";
+import { Search, ListTodo } from "lucide-react";
 import ModeToggle from "../mode-toggle";
 import React from "react";
 import { setSearchQuery } from "../../slices/todoSlice";
@@ -15,27 +14,27 @@ const Navbar = () => {
     // console.log(e.target.value);
   };
   return (
-    <nav className="bg-wine text-gray-100 p-4 flex flex-col md:flex-row items-center justify-between gap-4 shadow-xl">
-      <div className="flex items-center gap-2">
-        <LayoutList />
-        <h1 className="text-xl font-bold">Todo App</h1>
+    <nav className="bg-background text-foreground p-2 flex flex-col md:flex-row items-center justify-between gap-2 shadow-xl">
+      <div className="flex items-center gap-2 scroll-m-20 text-3xl font-extrabold tracking-tight lg:text-4xl">
+        <ListTodo />
+        <h1 className="">Your Todos</h1>
       </div>
 
       <div className="flex gap-2">
         <div className="flex items-center gap-2 w-full md:w-auto">
-          <Search className="text-gray-400" />
+          <Search className="bg-background text-foreground" />
           <Input
             onChange={e => handleSearchTodoInput(e)}
             type="text"
             placeholder="Search todos..."
-            className="w-full md:w-64 text-white bg-dark border-none"
+            className="h-10 p-2 bg-background text-foreground w-full md:w-64 border-0 border-b-2 border-border focus:border-b-accent focus:ring-0 focus-visible:outline-none focus-visible:ring-0"
           />
         </div>
 
-        <Button variant="ghost">
+        <div className="flex items-center justify-center gap-1">
           <HistoryModal />
           <ModeToggle />
-        </Button>
+        </div>
       </div>
     </nav>
   );

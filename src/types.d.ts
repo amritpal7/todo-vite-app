@@ -5,13 +5,17 @@ export interface Todo {
   text: string;
   completed: boolean;
   priority: Priority;
-  createdAt: string;
+  created_at: string;
   updatedAt?: string;
 }
 
 export interface TodoHistory {
+  todo_id: string;
   action: string;
   timeStamp: string;
-  todo: Todo;
-  previousTodo?: Todo; // Used for updates to track changes
+  created_at: string;
+  previous_text?: string; // Used for updates to track changes
+  previous_priority?: Priority;
+  new_text?: string;
+  new_priority?: Priority;
 }

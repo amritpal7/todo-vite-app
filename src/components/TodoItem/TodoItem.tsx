@@ -1,24 +1,26 @@
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { RootState } from "../../store";
 import {
+  fetchTodos,
   removeTodo,
   updateTodo,
   toggleCompleteTodo,
 } from "../../slices/todoSlice";
 import { Button } from "../ui/button";
-import { CheckCheck, Edit, Trash } from "lucide-react";
-import { useState } from "react";
+import { CheckCheck, Edit, Save, Trash, XCircle } from "lucide-react";
+import { useEffect, useState } from "react";
 import { Input } from "../ui/input";
 import { Priority } from "../../types";
 import {
-  Dialog,
-  DialogHeader,
-  DialogTrigger,
-  DialogDescription,
-  DialogTitle,
-  DialogContent,
-  DialogFooter,
-} from "../ui/dialog";
+  Drawer,
+  // DrawerClose,
+  DrawerContent,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from "../ui/drawer";
 import {
   Select,
   SelectTrigger,
@@ -26,18 +28,20 @@ import {
   SelectItem,
   SelectValue,
 } from "../ui/select";
+import { Tabs, TabsContent, TabsTrigger, TabsList } from "../ui/tabs";
 import { format, isValid, parseISO } from "date-fns";
+import { useAppDispatch } from "../../hooks";
 
 const getPriorityBorder = (priority: Priority) => {
   switch (priority) {
     case "High":
-      return "border-red-500";
+      return "border-destructive";
     case "Medium":
-      return "border-indigo-500";
+      return "border-primary";
     case "Low":
-      return "border-yellow-500";
+      return "border-accent";
     default:
-      return "border-gray-100";
+      return "border-muted";
   }
 };
 
@@ -46,12 +50,13 @@ const TodoItem = () => {
   const searchQuery = useSelector(
     (state: RootState) => state.todos.searchQuery
   );
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editText, setEditText] = useState("");
   const [priority, setPriority] = useState<Priority>("None");
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [filter, setFilter] = useState("All");
 
   const dateAndTime = (dateString: string | undefined) => {
     if (!dateString) return "N/A";
@@ -60,6 +65,10 @@ const TodoItem = () => {
       ? format(parsedDate, "MMM d, yyyy • hh:mm a")
       : "Invalid date!";
   };
+
+  useEffect(() => {
+    dispatch(fetchTodos());
+  }, []);
 
   const handleRemoveTodo = (id: string) => {
     dispatch(removeTodo(id));
@@ -87,126 +96,185 @@ const TodoItem = () => {
     dispatch(toggleCompleteTodo(id));
   };
 
-  const filteredTodos = todos.filter(todo =>
-    todo.text.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const getFilteredTodos = () => {
+    switch (filter) {
+      case "Completed":
+        return todos.filter(todo => todo.completed);
+      case "Pending":
+        return todos.filter(todo => !todo.completed);
+      case "All":
+        return todos.filter(todo =>
+          todo.text.toLowerCase().includes(searchQuery.toLowerCase())
+        );
+      default:
+        return todos;
+    }
+  };
+
+  const filteredTodos = getFilteredTodos();
 
   return (
-    <div className="space-y-4 mt-3 cursor-pointer max-h-[500px] overflow-y-auto">
-      {todos.length === 0 ? (
-        <li className="bg-gray-800 text-gray-900 p-3 rounded-lg shadow-md bg-gray">
-          No todos yet, add one to see!
-        </li>
-      ) : (
-        filteredTodos.map(todo => (
-          <li
-            key={todo.id}
-            className={`flex items-center justify-between bg-gray-800 dark:text-white text-dark p-3 rounded-lg shadow-md border-l-2 ${getPriorityBorder(
-              todo.priority
-            )} transition-all duration-300 ease-in-out hover:shadow-2xl`}
-          >
-            <span
-              className={`flex-1 ml-1 ${
-                todo.completed
-                  ? "line-through decoration-wavy decoration-wine text-red-400"
-                  : ""
-              }`}
-            >
-              {todo.text}
-            </span>
-            <div className="flex gap-1 ml-2">
-              <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-                <DialogTrigger asChild>
-                  <Button
-                    className="hover:bg-gray-700 dark:text-white"
-                    variant="ghost"
-                    size="icon"
-                    onClick={() =>
-                      handleEditTodo(todo.id, todo.text, todo.priority)
-                    }
-                  >
-                    <Edit size={16} />
-                  </Button>
-                </DialogTrigger>
-                {editingId === todo.id && (
-                  <DialogContent className="dark:bg-gray-900 dark:text-white border border-gray-700 backdrop-blur-md shadow-2xl rounded-xlß">
-                    <DialogHeader>
-                      <DialogTitle>Update Todo</DialogTitle>
-                      <DialogDescription className="flex justify-between items-center">
-                        <h3>Edit your todo and priority.</h3>
-                        <div className="grid grid-col">
-                          <span className="text-xs text-gray-400 mt-1">
-                            Last added: {dateAndTime(todo.createdAt)}
-                          </span>
-                          {todo.updatedAt && (
-                            <span className="text-xs text-gray-400 mt-1">
-                              Last updated: {dateAndTime(todo.updatedAt)}
-                            </span>
-                          )}
-                        </div>
-                      </DialogDescription>
-                    </DialogHeader>
-
-                    <Input
-                      type="text"
-                      value={editText}
-                      onChange={e => setEditText(e.target.value)}
-                      className="dark:bg-gray-700 text-gray-100 w-full"
-                    />
-
-                    {/* Priority Selection */}
-                    <Select
-                      value={priority}
-                      onValueChange={value => setPriority(value as Priority)}
+    <div>
+      <div className="max-w-2xl mx-auto p-6 bg-card text-card-foreground rounded-xl shadow-lg">
+        <Tabs defaultValue="All" onValueChange={setFilter} className="w-full">
+          <TabsList className="flex justify-between bg-muted rounded-md p-1">
+            {["All", "Completed", "Pending"].map(status => (
+              <TabsTrigger
+                key={status}
+                value={status}
+                className="w-full py-2 text-lg font-medium data-[state=active]:bg-card data-[state=active]:text-accent data-[state=active]:shadow-sm"
+                onClick={() => setFilter(status)}
+              >
+                {status}
+              </TabsTrigger>
+            ))}
+          </TabsList>
+          <TabsContent value={filter}>
+            <div className="space-y-4 mt-3 max-h-[400px] overflow-y-auto">
+              {todos.length === 0 ? (
+                <div className="flex justify-center items-center h-[60vh]">
+                  <li className="text-muted-foreground p-3 rounded-lg shadow-md text-center text-5xl">
+                    No todos yet, add one to see!
+                  </li>
+                </div>
+              ) : (
+                filteredTodos
+                  .slice()
+                  .reverse()
+                  .map(todo => (
+                    <li
+                      key={todo.id}
+                      className={`flex items-center justify-between p-3 rounded-lg shadow-md border-l-4 ${getPriorityBorder(
+                        todo.priority
+                      )} transition-all duration-300 ease-in-out bg-card text-card-foreground hover:scale-80`}
                     >
-                      <SelectTrigger className="dark:bg-gray-700 text-white">
-                        <SelectValue placeholder="Select Priority" />
-                      </SelectTrigger>
-                      <SelectContent className="bg-dark text-white">
-                        <SelectItem value="None">None</SelectItem>
-                        <SelectItem value="Low">Low</SelectItem>
-                        <SelectItem value="Medium">Medium</SelectItem>
-                        <SelectItem value="High">High</SelectItem>
-                      </SelectContent>
-                    </Select>
+                      <span
+                        className={`flex-1 ml-1 ${
+                          todo.completed
+                            ? "line-through decoration-wavy decoration-wine text-red-400"
+                            : ""
+                        }`}
+                      >
+                        {todo.text}
+                      </span>
+                      <div className="flex gap-1 ml-2">
+                        <Drawer
+                          open={isModalOpen}
+                          onOpenChange={setIsModalOpen}
+                        >
+                          <DrawerTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() =>
+                                handleEditTodo(
+                                  todo.id,
+                                  todo.text,
+                                  todo.priority
+                                )
+                              }
+                            >
+                              <Edit size={16} />
+                            </Button>
+                          </DrawerTrigger>
+                          {editingId === todo.id && (
+                            <DrawerContent className="flex items-center justify-center bg-card text-card-foreground border border-border shadow-2xl rounded-xl">
+                              <div className="mx-auto w-full max-w-sm">
+                                <DrawerHeader>
+                                  <DrawerTitle className="text-2xl">
+                                    Update Todo
+                                  </DrawerTitle>
+                                  <h3>Edit your todo and priority.</h3>
+                                  <DrawerDescription className="">
+                                    <div className="grid grid-col">
+                                      <span className="text-xs mt-1">
+                                        Last added:{" "}
+                                        {dateAndTime(todo.created_at)}
+                                      </span>
+                                      {todo.updatedAt && (
+                                        <span className="text-xs mt-1">
+                                          Last updated:{" "}
+                                          {dateAndTime(todo.updatedAt)}
+                                        </span>
+                                      )}
+                                    </div>
+                                  </DrawerDescription>
+                                </DrawerHeader>
 
-                    <DialogFooter>
-                      <Button
-                        className="hover:bg-gray-700 dark:text-white"
-                        onClick={() => handleUpdateTodo(todo.id)}
-                      >
-                        Save
-                      </Button>
-                      <Button
-                        className="hover:bg-gray-600 dark:text-white"
-                        onClick={() => setEditingId(null)}
-                      >
-                        Cancel
-                      </Button>
-                    </DialogFooter>
-                  </DialogContent>
-                )}
-              </Dialog>
-              <Button
-                className="hover:bg-gray-700 dark:text-white"
-                variant="ghost"
-                size="icon"
-                onClick={() => handleCompleteTodo(todo.id)}
-              >
-                <CheckCheck size={16} />
-              </Button>
-              <Button
-                className="hover:bg-red-500 dark:text-white"
-                variant="destructive"
-                size="icon"
-                onClick={() => handleRemoveTodo(todo.id)}
-              >
-                <Trash size={16} />
-              </Button>
+                                <div>
+                                  <Input
+                                    type="text"
+                                    value={editText}
+                                    onChange={e => setEditText(e.target.value)}
+                                    className="w-full"
+                                  />
+
+                                  {/* Priority Selection */}
+                                  <Select
+                                    value={priority}
+                                    onValueChange={value =>
+                                      setPriority(value as Priority)
+                                    }
+                                  >
+                                    <SelectTrigger className="bg-background text-foreground">
+                                      <SelectValue placeholder="Select Priority" />
+                                    </SelectTrigger>
+                                    <SelectContent className="bg-background text-foreground">
+                                      <SelectItem value="None">None</SelectItem>
+                                      <SelectItem value="Low">Low</SelectItem>
+                                      <SelectItem value="Medium">
+                                        Medium
+                                      </SelectItem>
+                                      <SelectItem value="High">High</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                </div>
+
+                                <DrawerFooter className="flex gap-2">
+                                  <Button
+                                    className="bg-background text-foreground"
+                                    onClick={() => handleUpdateTodo(todo.id)}
+                                    variant="ghost"
+                                  >
+                                    <Save />
+                                    Save
+                                  </Button>
+                                  <Button
+                                    className="bg-background text-foreground"
+                                    onClick={() => setEditingId(null)}
+                                    variant="ghost"
+                                  >
+                                    <XCircle />
+                                    Cancel
+                                  </Button>
+                                </DrawerFooter>
+                              </div>
+                            </DrawerContent>
+                          )}
+                        </Drawer>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleCompleteTodo(todo.id)}
+                        >
+                          <CheckCheck size={16} />
+                        </Button>
+                        <Button
+                          className="hover:bg-destructive"
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleRemoveTodo(todo.id)}
+                        >
+                          <Trash size={16} />
+                        </Button>
+                      </div>
+                    </li>
+                  ))
+              )}
             </div>
-          </li>
-        ))
-      )}
+          </TabsContent>
+        </Tabs>
+      </div>
     </div>
   );
 };

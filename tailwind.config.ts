@@ -1,9 +1,17 @@
-/** @type {import('tailwindcss').Config} */
-module.exports = {
+// /** @type {import('tailwindcss').Config} */
+
+import type { Config } from "tailwindcss";
+import { fontFamily } from "tailwindcss/defaultTheme";
+import animatePlugin from "tailwindcss-animate";
+
+const config = {
   darkMode: ["class"],
   content: ["./index.html", "./src/**/*.{ts,tsx,js,jsx}"],
   theme: {
     extend: {
+      fontFamily: {
+        sans: ["var(--font-sans)", ...fontFamily.sans],
+      },
       keyframes: {
         gradientBorder: {
           "0%": { borderColor: "white" },
@@ -60,13 +68,10 @@ module.exports = {
           4: "hsl(var(--chart-4))",
           5: "hsl(var(--chart-5))",
         },
-        gold: "#FFD700",
-        dark: "#3e3e3e",
-        gray: "#4f4f4f",
-        wine: "#722F37",
-        fade: "#3b3b3b",
       },
     },
   },
-  plugins: [require("tailwindcss-animate")],
-};
+  plugins: [animatePlugin],
+} satisfies Config;
+
+export default config;
