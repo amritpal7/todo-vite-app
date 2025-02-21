@@ -4,7 +4,6 @@ import { toast } from "../hooks/use-toast";
 import supabase from "../utils/supabase";
 import { v4 as uuidv4 } from "uuid";
 import { parseISO, format } from "date-fns";
-import { useDispatch } from "react-redux";
 
 interface TodoState {
   todos: Todo[];
